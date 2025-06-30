@@ -14,6 +14,93 @@ export default function InsightsTab() {
   const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
+  // Responsive layout calculations
+  const getResponsiveLayout = () => {
+    if (width > 768) {
+      // Desktop/Tablet
+      return {
+        containerPadding: 24,
+        headerPadding: 24,
+        fontSize: {
+          title: 28,
+          subtitle: 18,
+          sectionTitle: 20,
+          cardTitle: 18,
+          cardText: 16,
+          small: 14,
+        },
+        spacing: {
+          section: 32,
+          card: 20,
+          element: 16,
+        },
+        cardPadding: 24,
+      };
+    } else if (width > 480) {
+      // Large mobile
+      return {
+        containerPadding: 20,
+        headerPadding: 20,
+        fontSize: {
+          title: 24,
+          subtitle: 16,
+          sectionTitle: 18,
+          cardTitle: 16,
+          cardText: 14,
+          small: 12,
+        },
+        spacing: {
+          section: 24,
+          card: 16,
+          element: 12,
+        },
+        cardPadding: 20,
+      };
+    } else if (width > 360) {
+      // Medium mobile
+      return {
+        containerPadding: 16,
+        headerPadding: 16,
+        fontSize: {
+          title: 22,
+          subtitle: 15,
+          sectionTitle: 16,
+          cardTitle: 15,
+          cardText: 13,
+          small: 11,
+        },
+        spacing: {
+          section: 20,
+          card: 14,
+          element: 10,
+        },
+        cardPadding: 16,
+      };
+    } else {
+      // Small mobile
+      return {
+        containerPadding: 14,
+        headerPadding: 14,
+        fontSize: {
+          title: 20,
+          subtitle: 14,
+          sectionTitle: 15,
+          cardTitle: 14,
+          cardText: 12,
+          small: 10,
+        },
+        spacing: {
+          section: 16,
+          card: 12,
+          element: 8,
+        },
+        cardPadding: 14,
+      };
+    }
+  };
+
+  const layout = getResponsiveLayout();
+
   const detailedInsights = [
     {
       id: 'ai-stress-correlation',
@@ -160,12 +247,167 @@ export default function InsightsTab() {
     }
   };
 
+  const responsiveStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#FFFFFF',
+    },
+    header: {
+      paddingHorizontal: layout.containerPadding,
+      paddingVertical: layout.headerPadding,
+    },
+    headerContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: layout.fontSize.title,
+      fontWeight: '700',
+      color: '#1F2937',
+      marginTop: 8,
+      marginBottom: 4,
+    },
+    subtitle: {
+      fontSize: layout.fontSize.subtitle,
+      color: '#6B7280',
+    },
+    aiStatusBar: {
+      flexDirection: width > 480 ? 'row' : 'column',
+      justifyContent: 'space-between',
+      alignItems: width > 480 ? 'center' : 'flex-start',
+      paddingHorizontal: layout.containerPadding,
+      paddingVertical: 12,
+      backgroundColor: '#F0FDF4',
+      borderBottomWidth: 1,
+      borderBottomColor: '#D1FAE5',
+    },
+    aiStatusText: {
+      fontSize: layout.fontSize.small,
+      color: '#065F46',
+      marginLeft: 6,
+      fontWeight: '500',
+    },
+    dataPointsText: {
+      fontSize: layout.fontSize.small,
+      color: '#6B7280',
+      fontWeight: '500',
+      marginTop: width > 480 ? 0 : 4,
+    },
+    recommendationsSection: {
+      paddingHorizontal: layout.containerPadding,
+      paddingVertical: layout.spacing.element,
+      backgroundColor: '#FAFAFA',
+    },
+    recommendationsTitle: {
+      fontSize: layout.fontSize.sectionTitle,
+      fontWeight: '600',
+      color: '#1F2937',
+      marginBottom: layout.spacing.element,
+    },
+    recommendationCard: {
+      backgroundColor: '#F3E8FF',
+      padding: layout.cardPadding,
+      borderRadius: 12,
+      marginRight: 12,
+      width: Math.min(280, width * 0.8),
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+    },
+    recommendationText: {
+      fontSize: layout.fontSize.cardText,
+      color: '#7C3AED',
+      lineHeight: 18,
+      marginLeft: 8,
+      flex: 1,
+    },
+    filtersContent: {
+      paddingHorizontal: layout.containerPadding,
+    },
+    filterButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#F3F4F6',
+      paddingHorizontal: layout.spacing.element,
+      paddingVertical: 8,
+      borderRadius: 20,
+      marginRight: 12,
+    },
+    filterText: {
+      fontSize: layout.fontSize.cardText,
+      fontWeight: '500',
+      color: '#374151',
+      marginRight: 4,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: layout.containerPadding,
+    },
+    insightCard: {
+      backgroundColor: '#F9FAFB',
+      borderRadius: 16,
+      padding: layout.cardPadding,
+      marginBottom: layout.spacing.card,
+      borderWidth: 1,
+      borderColor: '#E5E7EB',
+    },
+    insightTitle: {
+      fontSize: layout.fontSize.cardTitle,
+      fontWeight: '600',
+      color: '#1F2937',
+      flex: 1,
+    },
+    insightDescription: {
+      fontSize: layout.fontSize.cardText,
+      color: '#6B7280',
+      lineHeight: 20,
+      marginBottom: layout.spacing.element,
+    },
+    metricLabel: {
+      fontSize: layout.fontSize.small,
+      color: '#9CA3AF',
+      fontWeight: '500',
+      marginBottom: 4,
+    },
+    metricValue: {
+      fontSize: layout.fontSize.cardText,
+      color: '#374151',
+      fontWeight: '600',
+    },
+    recommendationText: {
+      fontSize: layout.fontSize.small + 1,
+      color: '#6B7280',
+      lineHeight: 18,
+      flex: 1,
+    },
+    categoryText: {
+      fontSize: layout.fontSize.small,
+      color: '#8B5CF6',
+      fontWeight: '500',
+    },
+    timeframeText: {
+      fontSize: layout.fontSize.small,
+      color: '#9CA3AF',
+      fontStyle: 'italic',
+    },
+    summaryTitle: {
+      fontSize: layout.fontSize.sectionTitle,
+      fontWeight: '600',
+      color: '#065F46',
+      marginBottom: 8,
+    },
+    summaryText: {
+      fontSize: layout.fontSize.cardText,
+      color: '#065F46',
+      lineHeight: 20,
+    },
+  });
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={responsiveStyles.container}>
       <LinearGradient
         colors={['#F3E8FF', '#FFFFFF']}
-        style={styles.header}>
-        <View style={styles.headerContent}>
+        style={responsiveStyles.header}>
+        <View style={responsiveStyles.headerContent}>
           <TouchableOpacity 
             style={styles.backButton}
             onPress={() => router.back()}
@@ -175,8 +417,8 @@ export default function InsightsTab() {
           </TouchableOpacity>
           <View style={styles.headerText}>
             <Brain size={32} color="#8B5CF6" />
-            <Text style={styles.title}>AI-Powered Insights</Text>
-            <Text style={styles.subtitle}>Advanced behavioral analysis & predictions</Text>
+            <Text style={responsiveStyles.title}>AI-Powered Insights</Text>
+            <Text style={responsiveStyles.subtitle}>Advanced behavioral analysis & predictions</Text>
           </View>
           <TouchableOpacity 
             style={styles.refreshButton}
@@ -194,23 +436,23 @@ export default function InsightsTab() {
       </LinearGradient>
 
       {/* AI Status Bar */}
-      <View style={styles.aiStatusBar}>
+      <View style={responsiveStyles.aiStatusBar}>
         <View style={styles.aiStatusLeft}>
           <Sparkles size={16} color="#10B981" />
-          <Text style={styles.aiStatusText}>
+          <Text style={responsiveStyles.aiStatusText}>
             AI Analysis Active • Last updated: {lastUpdated.toLocaleTimeString()}
           </Text>
         </View>
         <View style={styles.aiStatusRight}>
-          <Text style={styles.dataPointsText}>
+          <Text style={responsiveStyles.dataPointsText}>
             {detailedInsights.reduce((sum, insight) => sum + (insight.dataPoints || 0), 0)} data points
           </Text>
         </View>
       </View>
 
       {/* AI Recommendations Section */}
-      <View style={styles.recommendationsSection}>
-        <Text style={styles.recommendationsTitle}>🤖 Personalized AI Recommendations</Text>
+      <View style={responsiveStyles.recommendationsSection}>
+        <Text style={responsiveStyles.recommendationsTitle}>🤖 Personalized AI Recommendations</Text>
         {isLoadingAI ? (
           <View style={styles.loadingRecommendations}>
             <ActivityIndicator size="small" color="#8B5CF6" />
@@ -220,9 +462,9 @@ export default function InsightsTab() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.recommendationsContainer}>
               {aiRecommendations.map((recommendation, index) => (
-                <View key={index} style={styles.recommendationCard}>
+                <View key={index} style={responsiveStyles.recommendationCard}>
                   <Sparkles size={16} color="#8B5CF6" />
-                  <Text style={styles.recommendationText}>{recommendation}</Text>
+                  <Text style={responsiveStyles.recommendationText}>{recommendation}</Text>
                 </View>
               ))}
             </View>
@@ -234,20 +476,20 @@ export default function InsightsTab() {
         <ScrollView 
           horizontal 
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filtersContent}
+          contentContainerStyle={responsiveStyles.filtersContent}
         >
           {filters.map((filter) => (
             <TouchableOpacity
               key={filter.id}
               style={[
-                styles.filterButton,
+                responsiveStyles.filterButton,
                 selectedFilter === filter.id && styles.activeFilterButton
               ]}
               onPress={() => setSelectedFilter(filter.id)}
               activeOpacity={0.7}
             >
               <Text style={[
-                styles.filterText,
+                responsiveStyles.filterText,
                 selectedFilter === filter.id && styles.activeFilterText
               ]}>
                 {filter.label}
@@ -260,9 +502,9 @@ export default function InsightsTab() {
         </ScrollView>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={responsiveStyles.content} showsVerticalScrollIndicator={false}>
         {filteredInsights.map((insight) => (
-          <View key={insight.id} style={styles.insightCard}>
+          <View key={insight.id} style={responsiveStyles.insightCard}>
             <View style={styles.insightHeader}>
               <View style={styles.insightTitleRow}>
                 <View style={[
@@ -274,7 +516,7 @@ export default function InsightsTab() {
                     { backgroundColor: getInsightColor(insight.type) }
                   ]} />
                 </View>
-                <Text style={styles.insightTitle}>{insight.title}</Text>
+                <Text style={responsiveStyles.insightTitle}>{insight.title}</Text>
                 {insight.aiGenerated && (
                   <View style={styles.aiIndicator}>
                     <Sparkles size={12} color="#8B5CF6" />
@@ -289,11 +531,11 @@ export default function InsightsTab() {
               </View>
             </View>
 
-            <Text style={styles.insightDescription}>{insight.description}</Text>
+            <Text style={responsiveStyles.insightDescription}>{insight.description}</Text>
 
             <View style={styles.insightMetrics}>
               <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>AI Confidence</Text>
+                <Text style={responsiveStyles.metricLabel}>AI Confidence</Text>
                 <View style={styles.confidenceBar}>
                   <View 
                     style={[
@@ -305,12 +547,12 @@ export default function InsightsTab() {
                     ]} 
                   />
                 </View>
-                <Text style={styles.metricValue}>{insight.confidence}%</Text>
+                <Text style={responsiveStyles.metricValue}>{insight.confidence}%</Text>
               </View>
               
               <View style={styles.metricRow}>
                 <View style={styles.metricItem}>
-                  <Text style={styles.metricLabel}>Impact</Text>
+                  <Text style={responsiveStyles.metricLabel}>Impact</Text>
                   <Text style={[
                     styles.impactBadge,
                     { 
@@ -322,8 +564,8 @@ export default function InsightsTab() {
                   </Text>
                 </View>
                 <View style={styles.metricItem}>
-                  <Text style={styles.metricLabel}>Data Points</Text>
-                  <Text style={styles.metricValue}>{insight.dataPoints || 'N/A'}</Text>
+                  <Text style={responsiveStyles.metricLabel}>Data Points</Text>
+                  <Text style={responsiveStyles.metricValue}>{insight.dataPoints || 'N/A'}</Text>
                 </View>
               </View>
             </View>
@@ -335,23 +577,23 @@ export default function InsightsTab() {
               {insight.recommendations.map((rec, index) => (
                 <View key={index} style={styles.recommendationItem}>
                   <View style={styles.recommendationBullet} />
-                  <Text style={styles.recommendationText}>{rec}</Text>
+                  <Text style={responsiveStyles.recommendationText}>{rec}</Text>
                 </View>
               ))}
             </View>
 
             <View style={styles.insightFooter}>
               <View style={styles.categoryTag}>
-                <Text style={styles.categoryText}>{insight.category}</Text>
+                <Text style={responsiveStyles.categoryText}>{insight.category}</Text>
               </View>
-              <Text style={styles.timeframeText}>{insight.timeframe}</Text>
+              <Text style={responsiveStyles.timeframeText}>{insight.timeframe}</Text>
             </View>
           </View>
         ))}
 
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>🧠 AI Analysis Summary</Text>
-          <Text style={styles.summaryText}>
+          <Text style={responsiveStyles.summaryTitle}>🧠 AI Analysis Summary</Text>
+          <Text style={responsiveStyles.summaryText}>
             Our machine learning models have analyzed {detailedInsights.reduce((sum, insight) => sum + (insight.dataPoints || 0), 0)} data points 
             from your behavior patterns. The AI has identified key optimization opportunities and predicts significant 
             wellness improvements through targeted interventions. Continue following AI recommendations for optimal results.
@@ -363,18 +605,6 @@ export default function InsightsTab() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   backButton: {
     width: 40,
     height: 40,
@@ -388,17 +618,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1F2937',
-    marginTop: 8,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-  },
   refreshButton: {
     width: 40,
     height: 40,
@@ -408,43 +627,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 16,
   },
-  aiStatusBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: '#F0FDF4',
-    borderBottomWidth: 1,
-    borderBottomColor: '#D1FAE5',
-  },
   aiStatusLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  aiStatusText: {
-    fontSize: 12,
-    color: '#065F46',
-    marginLeft: 6,
-    fontWeight: '500',
-  },
   aiStatusRight: {},
-  dataPointsText: {
-    fontSize: 12,
-    color: '#6B7280',
-    fontWeight: '500',
-  },
-  recommendationsSection: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#FAFAFA',
-  },
-  recommendationsTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 12,
-  },
   loadingRecommendations: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -460,60 +647,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingRight: 20,
   },
-  recommendationCard: {
-    backgroundColor: '#F3E8FF',
-    padding: 16,
-    borderRadius: 12,
-    marginRight: 12,
-    width: 280,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  recommendationText: {
-    fontSize: 14,
-    color: '#7C3AED',
-    lineHeight: 18,
-    marginLeft: 8,
-    flex: 1,
-  },
   filtersContainer: {
     paddingVertical: 16,
-  },
-  filtersContent: {
-    paddingHorizontal: 20,
-  },
-  filterButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 12,
   },
   activeFilterButton: {
     backgroundColor: '#8B5CF6',
   },
-  filterText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#374151',
-    marginRight: 4,
-  },
   activeFilterText: {
     color: '#FFFFFF',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  insightCard: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
   },
   insightHeader: {
     flexDirection: 'row',
@@ -538,12 +679,6 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-  },
-  insightTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    flex: 1,
   },
   aiIndicator: {
     flexDirection: 'row',
@@ -570,12 +705,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  insightDescription: {
-    fontSize: 14,
-    color: '#6B7280',
-    lineHeight: 20,
-    marginBottom: 16,
-  },
   insightMetrics: {
     marginBottom: 16,
   },
@@ -587,17 +716,6 @@ const styles = StyleSheet.create({
   metricItem: {
     flex: 1,
     marginRight: 16,
-  },
-  metricLabel: {
-    fontSize: 12,
-    color: '#9CA3AF',
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  metricValue: {
-    fontSize: 14,
-    color: '#374151',
-    fontWeight: '600',
   },
   confidenceBar: {
     height: 6,
@@ -616,6 +734,15 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 8,
     alignSelf: 'flex-start',
+  },
+  recommendationsSection: {
+    marginBottom: 16,
+  },
+  recommendationsTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
   },
   recommendationItem: {
     flexDirection: 'row',
@@ -642,31 +769,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
   },
-  categoryText: {
-    fontSize: 12,
-    color: '#8B5CF6',
-    fontWeight: '500',
-  },
-  timeframeText: {
-    fontSize: 12,
-    color: '#9CA3AF',
-    fontStyle: 'italic',
-  },
   summaryCard: {
     backgroundColor: '#ECFDF5',
     padding: 20,
     borderRadius: 16,
     marginBottom: 20,
-  },
-  summaryTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#065F46',
-    marginBottom: 8,
-  },
-  summaryText: {
-    fontSize: 14,
-    color: '#065F46',
-    lineHeight: 20,
   },
 });
