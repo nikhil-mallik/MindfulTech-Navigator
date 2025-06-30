@@ -15,10 +15,6 @@ interface TrendChartProps {
 }
 
 export function TrendChart({ data, onPress }: TrendChartProps) {
-  const chartHeight = 120;
-  const maxScore = Math.max(...data.map(d => d.score));
-  const chartWidth = width - 80;
-
   const getResponsiveLayout = () => {
     if (width > 768) {
       // Desktop/Tablet
@@ -26,11 +22,12 @@ export function TrendChart({ data, onPress }: TrendChartProps) {
         containerPadding: 24,
         chartHeight: 140,
         barWidth: 32,
+        spacing: 16,
         fontSize: {
-          title: 20,
-          day: 14,
-          score: 12,
-          trend: 16,
+          title: 18,
+          day: 12,
+          score: 10,
+          trend: 14,
         },
       };
     } else if (width > 480) {
@@ -39,30 +36,47 @@ export function TrendChart({ data, onPress }: TrendChartProps) {
         containerPadding: 20,
         chartHeight: 120,
         barWidth: 28,
+        spacing: 12,
         fontSize: {
-          title: 18,
-          day: 12,
-          score: 10,
-          trend: 14,
+          title: 16,
+          day: 11,
+          score: 9,
+          trend: 13,
+        },
+      };
+    } else if (width > 360) {
+      // Medium mobile
+      return {
+        containerPadding: 16,
+        chartHeight: 100,
+        barWidth: 24,
+        spacing: 8,
+        fontSize: {
+          title: 15,
+          day: 10,
+          score: 8,
+          trend: 12,
         },
       };
     } else {
       // Small mobile
       return {
-        containerPadding: 16,
-        chartHeight: 100,
-        barWidth: 24,
+        containerPadding: 14,
+        chartHeight: 90,
+        barWidth: 20,
+        spacing: 6,
         fontSize: {
-          title: 16,
-          day: 10,
-          score: 9,
-          trend: 12,
+          title: 14,
+          day: 9,
+          score: 7,
+          trend: 11,
         },
       };
     }
   };
 
   const layout = getResponsiveLayout();
+  const maxScore = Math.max(...data.map(d => d.score));
 
   return (
     <TouchableOpacity 
@@ -71,21 +85,23 @@ export function TrendChart({ data, onPress }: TrendChartProps) {
       activeOpacity={0.7}
     >
       <View style={styles.header}>
-        <TrendingUp size={20} color="#10B981" />
-        <Text style={[styles.title, { fontSize: layout.fontSize.title }]}>
-          Weekly Wellness Trend
-        </Text>
-        <BarChart3 size={16} color="#6B7280" />
+        <View style={styles.headerLeft}>
+          <TrendingUp size={18} color="#10B981" />
+          <Text style={[styles.title, { fontSize: layout.fontSize.title, marginLeft: 8 }]}>
+            Weekly Wellness Trend
+          </Text>
+        </View>
+        <BarChart3 size={14} color="#6B7280" />
       </View>
       
-      <View style={styles.chartContainer}>
+      <View style={[styles.chartContainer, { marginTop: layout.spacing }]}>
         <View style={[styles.chartArea, { height: layout.chartHeight }]}>
           {data.map((item, index) => {
-            const barHeight = (item.score / maxScore) * layout.chartHeight;
+            const barHeight = Math.max((item.score / maxScore) * layout.chartHeight * 0.8, 8);
             const isToday = index === data.length - 1;
             
             return (
-              <View key={item.day} style={styles.barContainer}>
+              <View key={item.day} style={[styles.barContainer, { marginHorizontal: layout.spacing / 4 }]}>
                 <View style={[styles.barBackground, { height: layout.chartHeight }]}>
                   <View
                     style={[
@@ -100,14 +116,14 @@ export function TrendChart({ data, onPress }: TrendChartProps) {
                 </View>
                 <Text style={[
                   styles.dayLabel, 
-                  { fontSize: layout.fontSize.day },
+                  { fontSize: layout.fontSize.day, marginTop: 6 },
                   isToday && styles.todayLabel
                 ]}>
                   {item.day}
                 </Text>
                 <Text style={[
                   styles.scoreLabel, 
-                  { fontSize: layout.fontSize.score },
+                  { fontSize: layout.fontSize.score, marginTop: 2 },
                   isToday && styles.todayScore
                 ]}>
                   {item.score}
@@ -117,11 +133,13 @@ export function TrendChart({ data, onPress }: TrendChartProps) {
           })}
         </View>
         
-        <View style={styles.chartFooter}>
+        <View style={[styles.chartFooter, { marginTop: layout.spacing }]}>
           <Text style={[styles.trend, { fontSize: layout.fontSize.trend }]}>
             📈 +6% improvement this week
           </Text>
-          <Text style={styles.tapHint}>Tap for detailed insights</Text>
+          <Text style={[styles.tapHint, { fontSize: Math.max(layout.fontSize.trend - 2, 10) }]}>
+            Tap for detailed insights
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -140,13 +158,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   title: {
     fontWeight: '600',
     color: '#1F2937',
-    flex: 1,
-    marginLeft: 8,
+    flexShrink: 1,
   },
   chartContainer: {
     alignItems: 'center',
@@ -156,12 +177,11 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     width: '100%',
-    marginBottom: 10,
   },
   barContainer: {
     alignItems: 'center',
     flex: 1,
-    marginHorizontal: 2,
+    minWidth: 0,
   },
   barBackground: {
     justifyContent: 'flex-end',
@@ -173,8 +193,8 @@ const styles = StyleSheet.create({
   },
   dayLabel: {
     color: '#6B7280',
-    marginTop: 8,
     fontWeight: '500',
+    textAlign: 'center',
   },
   todayLabel: {
     color: '#10B981',
@@ -182,18 +202,18 @@ const styles = StyleSheet.create({
   },
   scoreLabel: {
     color: '#9CA3AF',
-    marginTop: 2,
+    textAlign: 'center',
   },
   todayScore: {
     color: '#10B981',
     fontWeight: '600',
   },
   chartFooter: {
-    marginTop: 16,
-    paddingTop: 16,
+    paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
     alignItems: 'center',
+    width: '100%',
   },
   trend: {
     color: '#059669',
@@ -202,8 +222,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   tapHint: {
-    fontSize: 12,
     color: '#9CA3AF',
     fontStyle: 'italic',
+    textAlign: 'center',
   },
 });

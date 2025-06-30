@@ -1,37 +1,79 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Brain, TrendingUp, Clock, Target, ArrowLeft, Filter } from 'lucide-react-native';
+import { Brain, TrendingUp, Clock, Target, ArrowLeft, Filter, Sparkles, RefreshCw } from 'lucide-react-native';
 import { router } from 'expo-router';
+import { aiAnalysisService, generatePersonalizedRecommendations } from '@/services/aiAnalysis';
 
 const { width } = Dimensions.get('window');
 
 export default function InsightsTab() {
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
+  const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
   const detailedInsights = [
     {
-      id: 'progress',
-      type: 'positive',
-      title: 'Mindful Break Improvement',
-      description: 'You took 3 more mindful breaks today compared to yesterday',
+      id: 'ai-stress-correlation',
+      type: 'warning',
+      title: 'AI-Detected Stress-Usage Pattern',
+      description: 'Machine learning analysis identified 73% correlation between calendar stress events and increased social media usage, particularly on Mondays and Thursdays.',
       impact: 'High',
-      confidence: 92,
-      trend: '+15%',
+      confidence: 87,
+      trend: '+73%',
       recommendations: [
-        'Continue this positive trend',
-        'Set reminders for consistent breaks',
-        'Try extending break duration to 5 minutes'
+        'Schedule preemptive breathing breaks before stressful meetings',
+        'Use app timers during high-stress periods identified by AI',
+        'Practice the 5-4-3-2-1 grounding technique when stress patterns emerge'
       ],
-      timeframe: 'Last 24 hours',
-      category: 'Wellness Habits'
+      timeframe: 'Last 30 days',
+      category: 'AI Behavioral Analysis',
+      aiGenerated: true,
+      dataPoints: 156
+    },
+    {
+      id: 'ai-optimal-timing',
+      type: 'info',
+      title: 'Neural Network Timing Optimization',
+      description: 'Deep learning models predict 2:30 PM as your peak stress time with 91% accuracy. Interventions are 40% more effective when deployed 15 minutes prior.',
+      impact: 'High',
+      confidence: 91,
+      trend: '+40%',
+      recommendations: [
+        'Set automatic mindful break reminders for 2:15 PM',
+        'Schedule important tasks before 2:00 PM when possible',
+        'Use AI-recommended breathing exercises during this window'
+      ],
+      timeframe: 'Last 14 days',
+      category: 'Predictive Analytics',
+      aiGenerated: true,
+      dataPoints: 89
+    },
+    {
+      id: 'mindfulness-progress',
+      type: 'positive',
+      title: 'AI-Measured Mindfulness Efficacy',
+      description: 'Deep learning analysis shows your breathing exercises are 34% more effective than baseline. Heart rate variability improved by 23% during afternoon sessions.',
+      impact: 'High',
+      confidence: 94,
+      trend: '+34%',
+      recommendations: [
+        'Continue afternoon breathing practice schedule',
+        'Gradually increase session duration to 7 minutes as suggested by AI',
+        'Experiment with 4-7-8 breathing pattern for enhanced results'
+      ],
+      timeframe: 'Last 21 days',
+      category: 'Performance Optimization',
+      aiGenerated: true,
+      dataPoints: 67
     },
     {
       id: 'evening-usage',
       type: 'warning',
       title: 'Late Night Screen Time Pattern',
-      description: 'Screen time increased by 45 minutes after 9 PM over the past week',
+      description: 'Traditional analysis shows screen time increased by 45 minutes after 9 PM over the past week',
       impact: 'Medium',
       confidence: 87,
       trend: '+45min',
@@ -41,51 +83,63 @@ export default function InsightsTab() {
         'Try reading or meditation before bed'
       ],
       timeframe: 'Last 7 days',
-      category: 'Sleep Health'
+      category: 'Sleep Health',
+      aiGenerated: false,
+      dataPoints: 42
     },
     {
-      id: 'stress-pattern',
-      type: 'info',
-      title: 'Stress-Related Usage Correlation',
-      description: 'Social media usage increases by 60% on high-stress days',
-      impact: 'High',
-      confidence: 94,
-      trend: '+60%',
-      recommendations: [
-        'Use breathing exercises during stress',
-        'Schedule nature breaks on busy days',
-        'Practice mindful social media consumption'
-      ],
-      timeframe: 'Last 30 days',
-      category: 'Behavioral Patterns'
-    },
-    {
-      id: 'focus-improvement',
+      id: 'ai-social-prediction',
       type: 'positive',
-      title: 'Focus Session Success',
-      description: 'Your focus sessions have improved by 25% in duration',
-      impact: 'High',
-      confidence: 89,
-      trend: '+25%',
+      title: 'Social Connection Impact Prediction',
+      description: 'Predictive modeling suggests reaching out to close contacts during low-mood periods increases wellness scores by 28% within 2 hours.',
+      impact: 'Medium',
+      confidence: 82,
+      trend: '+28%',
       recommendations: [
-        'Gradually increase session length',
-        'Try different focus techniques',
-        'Reward yourself for consistency'
+        'Maintain a list of 3-5 trusted contacts for difficult moments',
+        'Use voice calls over text messages for stronger connection',
+        'Schedule regular check-ins with important relationships'
       ],
-      timeframe: 'Last 14 days',
-      category: 'Productivity'
+      timeframe: 'Last 45 days',
+      category: 'Social Wellness AI',
+      aiGenerated: true,
+      dataPoints: 43
     }
   ];
+
+  useEffect(() => {
+    loadAIRecommendations();
+  }, []);
+
+  const loadAIRecommendations = async () => {
+    setIsLoadingAI(true);
+    try {
+      const recommendations = await generatePersonalizedRecommendations({});
+      setAiRecommendations(recommendations);
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error('Failed to load AI recommendations:', error);
+    } finally {
+      setIsLoadingAI(false);
+    }
+  };
+
+  const refreshAIAnalysis = async () => {
+    await loadAIRecommendations();
+  };
 
   const filters = [
     { id: 'all', label: 'All Insights' },
     { id: 'positive', label: 'Positive' },
     { id: 'warning', label: 'Needs Attention' },
-    { id: 'info', label: 'Patterns' }
+    { id: 'info', label: 'Patterns' },
+    { id: 'ai', label: 'AI Generated' }
   ];
 
   const filteredInsights = selectedFilter === 'all' 
     ? detailedInsights 
+    : selectedFilter === 'ai'
+    ? detailedInsights.filter(insight => insight.aiGenerated)
     : detailedInsights.filter(insight => insight.type === selectedFilter);
 
   const getInsightColor = (type: string) => {
@@ -121,11 +175,60 @@ export default function InsightsTab() {
           </TouchableOpacity>
           <View style={styles.headerText}>
             <Brain size={32} color="#8B5CF6" />
-            <Text style={styles.title}>Detailed Insights</Text>
-            <Text style={styles.subtitle}>AI-powered behavior analysis</Text>
+            <Text style={styles.title}>AI-Powered Insights</Text>
+            <Text style={styles.subtitle}>Advanced behavioral analysis & predictions</Text>
           </View>
+          <TouchableOpacity 
+            style={styles.refreshButton}
+            onPress={refreshAIAnalysis}
+            activeOpacity={0.7}
+            disabled={isLoadingAI}
+          >
+            {isLoadingAI ? (
+              <ActivityIndicator size="small" color="#8B5CF6" />
+            ) : (
+              <RefreshCw size={20} color="#8B5CF6" />
+            )}
+          </TouchableOpacity>
         </View>
       </LinearGradient>
+
+      {/* AI Status Bar */}
+      <View style={styles.aiStatusBar}>
+        <View style={styles.aiStatusLeft}>
+          <Sparkles size={16} color="#10B981" />
+          <Text style={styles.aiStatusText}>
+            AI Analysis Active • Last updated: {lastUpdated.toLocaleTimeString()}
+          </Text>
+        </View>
+        <View style={styles.aiStatusRight}>
+          <Text style={styles.dataPointsText}>
+            {detailedInsights.reduce((sum, insight) => sum + (insight.dataPoints || 0), 0)} data points
+          </Text>
+        </View>
+      </View>
+
+      {/* AI Recommendations Section */}
+      <View style={styles.recommendationsSection}>
+        <Text style={styles.recommendationsTitle}>🤖 Personalized AI Recommendations</Text>
+        {isLoadingAI ? (
+          <View style={styles.loadingRecommendations}>
+            <ActivityIndicator size="small" color="#8B5CF6" />
+            <Text style={styles.loadingText}>Generating personalized recommendations...</Text>
+          </View>
+        ) : (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.recommendationsContainer}>
+              {aiRecommendations.map((recommendation, index) => (
+                <View key={index} style={styles.recommendationCard}>
+                  <Sparkles size={16} color="#8B5CF6" />
+                  <Text style={styles.recommendationText}>{recommendation}</Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        )}
+      </View>
 
       <View style={styles.filtersContainer}>
         <ScrollView 
@@ -149,6 +252,9 @@ export default function InsightsTab() {
               ]}>
                 {filter.label}
               </Text>
+              {filter.id === 'ai' && (
+                <Sparkles size={12} color={selectedFilter === filter.id ? '#FFFFFF' : '#8B5CF6'} />
+              )}
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -169,6 +275,12 @@ export default function InsightsTab() {
                   ]} />
                 </View>
                 <Text style={styles.insightTitle}>{insight.title}</Text>
+                {insight.aiGenerated && (
+                  <View style={styles.aiIndicator}>
+                    <Sparkles size={12} color="#8B5CF6" />
+                    <Text style={styles.aiIndicatorText}>AI</Text>
+                  </View>
+                )}
               </View>
               <View style={styles.metricsBadge}>
                 <Text style={[styles.trend, { color: getInsightColor(insight.type) }]}>
@@ -181,7 +293,7 @@ export default function InsightsTab() {
 
             <View style={styles.insightMetrics}>
               <View style={styles.metricItem}>
-                <Text style={styles.metricLabel}>Confidence</Text>
+                <Text style={styles.metricLabel}>AI Confidence</Text>
                 <View style={styles.confidenceBar}>
                   <View 
                     style={[
@@ -210,14 +322,16 @@ export default function InsightsTab() {
                   </Text>
                 </View>
                 <View style={styles.metricItem}>
-                  <Text style={styles.metricLabel}>Timeframe</Text>
-                  <Text style={styles.metricValue}>{insight.timeframe}</Text>
+                  <Text style={styles.metricLabel}>Data Points</Text>
+                  <Text style={styles.metricValue}>{insight.dataPoints || 'N/A'}</Text>
                 </View>
               </View>
             </View>
 
             <View style={styles.recommendationsSection}>
-              <Text style={styles.recommendationsTitle}>Recommendations</Text>
+              <Text style={styles.recommendationsTitle}>
+                {insight.aiGenerated ? '🤖 AI Recommendations' : '💡 Recommendations'}
+              </Text>
               {insight.recommendations.map((rec, index) => (
                 <View key={index} style={styles.recommendationItem}>
                   <View style={styles.recommendationBullet} />
@@ -226,17 +340,21 @@ export default function InsightsTab() {
               ))}
             </View>
 
-            <View style={styles.categoryTag}>
-              <Text style={styles.categoryText}>{insight.category}</Text>
+            <View style={styles.insightFooter}>
+              <View style={styles.categoryTag}>
+                <Text style={styles.categoryText}>{insight.category}</Text>
+              </View>
+              <Text style={styles.timeframeText}>{insight.timeframe}</Text>
             </View>
           </View>
         ))}
 
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>📊 Weekly Summary</Text>
+          <Text style={styles.summaryTitle}>🧠 AI Analysis Summary</Text>
           <Text style={styles.summaryText}>
-            Based on your patterns, you're making excellent progress in mindfulness practices. 
-            Focus on maintaining consistent evening routines to optimize your digital wellness journey.
+            Our machine learning models have analyzed {detailedInsights.reduce((sum, insight) => sum + (insight.dataPoints || 0), 0)} data points 
+            from your behavior patterns. The AI has identified key optimization opportunities and predicts significant 
+            wellness improvements through targeted interventions. Continue following AI recommendations for optimal results.
           </Text>
         </View>
       </ScrollView>
@@ -281,6 +399,83 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
   },
+  refreshButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 16,
+  },
+  aiStatusBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: '#F0FDF4',
+    borderBottomWidth: 1,
+    borderBottomColor: '#D1FAE5',
+  },
+  aiStatusLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  aiStatusText: {
+    fontSize: 12,
+    color: '#065F46',
+    marginLeft: 6,
+    fontWeight: '500',
+  },
+  aiStatusRight: {},
+  dataPointsText: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  recommendationsSection: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#FAFAFA',
+  },
+  recommendationsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 12,
+  },
+  loadingRecommendations: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginLeft: 8,
+  },
+  recommendationsContainer: {
+    flexDirection: 'row',
+    paddingRight: 20,
+  },
+  recommendationCard: {
+    backgroundColor: '#F3E8FF',
+    padding: 16,
+    borderRadius: 12,
+    marginRight: 12,
+    width: 280,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  recommendationText: {
+    fontSize: 14,
+    color: '#7C3AED',
+    lineHeight: 18,
+    marginLeft: 8,
+    flex: 1,
+  },
   filtersContainer: {
     paddingVertical: 16,
   },
@@ -288,6 +483,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   filterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#F3F4F6',
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -301,6 +498,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#374151',
+    marginRight: 4,
   },
   activeFilterText: {
     color: '#FFFFFF',
@@ -346,6 +544,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1F2937',
     flex: 1,
+  },
+  aiIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3E8FF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  aiIndicatorText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#8B5CF6',
+    marginLeft: 4,
   },
   metricsBadge: {
     backgroundColor: '#FFFFFF',
@@ -404,15 +617,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: 'flex-start',
   },
-  recommendationsSection: {
-    marginBottom: 16,
-  },
-  recommendationsTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 8,
-  },
   recommendationItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -426,14 +630,13 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginRight: 8,
   },
-  recommendationText: {
-    fontSize: 13,
-    color: '#6B7280',
-    lineHeight: 18,
-    flex: 1,
+  insightFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 12,
   },
   categoryTag: {
-    alignSelf: 'flex-start',
     backgroundColor: '#F3E8FF',
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -443,6 +646,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#8B5CF6',
     fontWeight: '500',
+  },
+  timeframeText: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontStyle: 'italic',
   },
   summaryCard: {
     backgroundColor: '#ECFDF5',
